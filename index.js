@@ -69,7 +69,7 @@ module.exports = plugin => {
 
   plugin.setOptions({ dev: true });
 
-  plugin.registerCommand('EchoMessage', async () => {
+  plugin.registerCommand('Arrow', async () => {
       try {
         const line = await getSelectedLine();
         const newString = convertArrowFunction(line);
