@@ -15,7 +15,24 @@ const toJavascript = (str) => {
   if (!prop || !prop.length || !value) {
     return '';
   }
-  return `  ${prop[0].toLowerCase()}: "${value}",`
+  return `  ${prop[0].toLowerCase().replace(/\s/g, '')}: "${value}",`
+}
+
+const destructuring = (str) => {
+  const startExp = /[a-z]{1,}\s\{/;
+  const endExp = /\}\s{0,}\=.{1,}/;
+  const middle = str
+    .replace(startExp, '')
+    .replace(endExp, '');
+  const startRes = str.match(startExp);
+  const endRes = str.match(endExp);
+  const start = startRes && startRes[0];
+  const end = endRes && endRes[0];
+
+  if (start && end && middle) {
+    return [ start, middle, end ];
+  }
+
 }
 
 const getWrappedArray = (array) => ['{', ...array, '}'];
@@ -53,10 +70,6 @@ module.exports = plugin => {
 
         const wrapped = getWrappedArray(res);
 
-        fs.writeFile(os.homedir() + '/vimerror.txt', JSON.stringify(wrapped), function (err) {
-          if (err) throw err;
-        });
-
         await plugin.nvim.buffer.replace(wrapped, lineStart -1); 
 
       } catch (err) {
@@ -65,6 +78,25 @@ module.exports = plugin => {
         });
       }
     }, { sync: false });
+
+
+  plugin.registerCommand('Destr', async () => {
+    try {
+      const startSelection = await plugin.nvim.eval("getpos(\"'<\")");
+      const endSelection =  await plugin.nvim.eval("getpos(\"'>\")");
+      const lineStart = startSelection[1];
+      const lineEnd = endSelection[1];
+      const lines = await plugin.nvim.getLine(lineStart, lineEnd);
+      const res = destructuring(lines)
+
+      await plugin.nvim.buffer.replace(res, lineStart -1); 
+
+    } catch (err) {
+      fs.writeFile(os.homedir() + '/vimerror.txt', JSON.stringify(err.message), function (err) {
+        if (err) throw err;
+      });
+    }
+  }, { sync: false });
 
 
 
