@@ -110,3 +110,4 @@ module.exports = plugin => {
   }, { sync: false });
 
 };
+
