@@ -86,7 +86,9 @@ module.exports = plugin => {
       const lines = await getSelectedLine()
       const res = destructuringTabulation(lines)
       const lineStart = await getLineStart();
-      await plugin.nvim.buffer.replace(res, lineStart -1); 
+      //await plugin.nvim.buffer.replace(res, lineStart -1); 
+      await plugin.nvim.buffer.remove(lineStart -1,lineStart); 
+      await plugin.nvim.buffer.insert(res, lineStart - 1); 
     } catch (err) {
       writeErrorToFile(os.homedir(), 'vimerror.txt');
     }
