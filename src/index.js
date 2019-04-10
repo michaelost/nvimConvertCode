@@ -15,6 +15,8 @@ const toJavascript = (str) => {
   return `  ${prop[0].toLowerCase().replace(/\s/g, '')}: "${value}",`
 }
 
+const toArray = (strArray) => getWrappedArray2(strArray.filter(el => el).map(el => (`  "${el}", `)));
+
 const destructuring = (str) => {
   const startExp = /[a-z]{1,}\s\{/;
   const endExp = /\}\s{0,}\=.{1,}/;
@@ -50,6 +52,7 @@ const destructuringTabulation = (str) => {
 }
 
 const getWrappedArray = (array) => ['{', ...array, '}'];
+const getWrappedArray2 = (array) => ['[', ...array, ']'];
 
 module.exports = {
   convertArrowFunction,
@@ -57,4 +60,7 @@ module.exports = {
   destructuring,
   destructuringTabulation,
   toJavascript,
+  toArray,
 }
+
+

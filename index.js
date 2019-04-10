@@ -7,6 +7,7 @@ const {
   destructuring,
   destructuringTabulation,
   toJavascript,
+  toArray,
 } = require('./src/index');
 
 module.exports = plugin => {
@@ -33,8 +34,8 @@ module.exports = plugin => {
     return startSelection[1];
   }
 
-  const writeErrorToFile = (filePath, fileName) => {
-    fs.writeFile(`${filePath}/fileName`, JSON.stringify(err.message), function (err) {
+  const writeErrorToFile = (filePath, fileName, data) => {
+    fs.writeFile(`${filePath}/${fileName}`, JSON.stringify(data), function (err) {
       if (err) throw err;
     });
   }
@@ -66,6 +67,19 @@ module.exports = plugin => {
         await plugin.nvim.buffer.replace(wrapped, lineStart -1); 
       } catch (err) {
         writeErrorToFile(os.homedir(), 'vimerror.txt');
+      }
+    }, { sync: false });
+
+  plugin.registerCommand('Arr', async () => {
+      try {
+        const lines = await getSelectedLines();
+        const array = toArray(lines); 
+        const lineStart = await getLineStart();
+        writeErrorToFile(os.homedir(), 'vimerror.txt', array);
+        await plugin.nvim.buffer.remove(lineStart -1,lineStart); 
+        await plugin.nvim.buffer.replace(array, lineStart -1); 
+      } catch (err) {
+        writeErrorToFile(os.homedir(), 'vimerror.txt', err.message);
       }
     }, { sync: false });
 
