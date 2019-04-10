@@ -16,6 +16,7 @@ const toJavascript = (str) => {
 }
 
 const toArray = (strArray) => getWrappedArray2(strArray.filter(el => el).map(el => (`  "${el}", `)));
+const toArrayInline = (strArray) => getWrappedArray2(strArray.filter(el => el).map(el => (`"${el}", `))).join('');
 
 const destructuring = (str) => {
   const startExp = /[a-z]{1,}\s\{/;
@@ -61,6 +62,7 @@ module.exports = {
   destructuringTabulation,
   toJavascript,
   toArray,
+  toArrayInline,
 }
 
 
