@@ -72,6 +72,15 @@ const destructuringTabulationProps = (str) => {
     .map((el, index) => (index == 0 ? `${el},` : `${tabString}${el.replace(/\s/g, '')},`));
 }
 
+const destructuringTabulationPropsToOneString = (lines) => {
+  const tabulation = lines[0].length - lines[0].replace(/\s/g, '').length;
+  const tabString = getTabulationString(tabulation);
+  return lines 
+    .filter(el => el)
+    .map((el, index) => (index == 0 ? `${el} ` : `${el.replace(/\s/g, '')} `))
+    .join('');
+}
+
 const getWrappedArray = (array) => ['{', ...array, '}'];
 const getWrappedArray2 = (array) => ['[', ...array, ']'];
 
@@ -84,6 +93,7 @@ module.exports = {
   toArray,
   toArrayInline,
   destructuringTabulationProps,
+  destructuringTabulationPropsToOneString,
 }
 
 

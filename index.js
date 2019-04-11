@@ -9,6 +9,8 @@ const {
   toJavascript,
   toArray,
   toArrayInline,
+  destructuringTabulationProps,
+  destructuringTabulationPropsToOneString
 } = require('./src/index');
 
 module.exports = plugin => {
@@ -124,6 +126,34 @@ module.exports = plugin => {
       await plugin.nvim.buffer.insert(res, lineStart - 1); 
     } catch (err) {
       writeErrorToFile(os.homedir(), 'vimerror.txt');
+    }
+  }, { sync: false });
+
+  plugin.registerCommand('P1', async () => {
+    try {
+      const line = await getSelectedLine()
+      const res = destructuringTabulationProps(line)
+      const lineStart = await getLineStart();
+      writeErrorToFile(os.homedir(), 'vimerror.txt', res);
+      await plugin.nvim.buffer.remove(lineStart -1, lineStart); 
+      await plugin.nvim.buffer.insert(res, lineStart - 1); 
+    } catch (err) {
+      writeErrorToFile(os.homedir(), 'vimerror.txt', err);
+    }
+  }, { sync: false });
+
+  plugin.registerCommand('P2', async () => {
+    try {
+      const lines = await getSelectedLines()
+      const res = destructuringTabulationPropsToOneString(lines)
+      const lineStart = await getLineStart();
+      const lineEnd = await getLineEnd();
+
+      writeErrorToFile(os.homedir(), 'vimerror.txt', lines);
+      await plugin.nvim.buffer.remove(lineStart -1, lineEnd); 
+      await plugin.nvim.buffer.insert(res, lineStart -1); 
+    } catch (err) {
+      writeErrorToFile(os.homedir(), 'vimerror.txt', err.message);
     }
   }, { sync: false });
 
