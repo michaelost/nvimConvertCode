@@ -23,12 +23,23 @@ module.exports = plugin => {
     return await plugin.nvim.getLine(lineStart, lineEnd);
   }
 
-  const getSelectedLines = async () => {
+  const getSelectedLines = async (start, end) => {
+    if (start && end) {
+      return await plugin.nvim.buffer.getLines({ start, end });
+    }
     const startSelection = await plugin.nvim.eval("getpos(\"'<\")");
     const endSelection =  await plugin.nvim.eval("getpos(\"'>\")");
     const lineStart = startSelection[1];
     const lineEnd = endSelection[1];
     return await plugin.nvim.buffer.getLines({ start: lineStart, end: lineEnd });
+  }
+
+  const getSelectedLinesRange = async () => {
+    const startSelection = await plugin.nvim.eval("getpos(\"'<\")");
+    const endSelection =  await plugin.nvim.eval("getpos(\"'>\")");
+    const lineStart = startSelection[1];
+    const lineEnd = endSelection[1];
+    return { start: lineStart, end: lineEnd };
   }
 
 
@@ -129,6 +140,19 @@ module.exports = plugin => {
     }
   }, { sync: false });
 
+
+/*
+  converts:
+    error, data, dataType, owner, stepId, incidentId, 
+  to:
+    error,
+    data,
+    dataType,
+    owner,
+    stepId,
+    incidentId,
+*/
+
   plugin.registerCommand('P1', async () => {
     try {
       const line = await getSelectedLine()
@@ -142,20 +166,31 @@ module.exports = plugin => {
     }
   }, { sync: false });
 
+/*
+  converts:
+    error,
+    data,
+    dataType,
+    owner,
+    stepId,
+    incidentId,
+  to:
+    error, data, dataType, owner, stepId, incidentId, 
+*/
+
   plugin.registerCommand('P2', async () => {
     try {
-      const lines = await getSelectedLines()
-      const res = destructuringTabulationPropsToOneString(lines)
-      const lineStart = await getLineStart();
-      const lineEnd = await getLineEnd();
-
+      const { start, end } = await getSelectedLinesRange();
+      const lines = await getSelectedLines(start -1, end);
       writeErrorToFile(os.homedir(), 'vimerror.txt', lines);
-      await plugin.nvim.buffer.remove(lineStart -1, lineEnd); 
-      await plugin.nvim.buffer.insert(res, lineStart -1); 
+      await plugin.nvim.buffer.remove(start -1, end); 
+      const res = destructuringTabulationPropsToOneString(lines)
+      await plugin.nvim.buffer.insert(res, start -1); 
     } catch (err) {
       writeErrorToFile(os.homedir(), 'vimerror.txt', err.message);
     }
   }, { sync: false });
+
 
 };
 
