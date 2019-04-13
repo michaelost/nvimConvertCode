@@ -128,12 +128,23 @@ module.exports = plugin => {
 
   plugin.registerCommand('D', async () => {
     try {
-      const lines = await getSelectedLine()
-      const res = destructuring(lines)
+
+      const { start, end } = await getSelectedLinesRange();
+      let lines = await getSelectedLines(start -1, end);
+      if (Array.isArray(lines) && lines.length == 1) {
+        lines = lines[0];
+      }
+
       const lineStart = await getLineStart();
-      await plugin.nvim.buffer.replace(res, lineStart -1); 
+      const res = destructuring(lines)
+      writeErrorToFile(os.homedir(), 'vimerror.txt', lines);
+
+      await plugin.nvim.buffer.remove(lineStart -1, lineStart); 
+      await plugin.nvim.buffer.insert(res, lineStart - 1); 
+
+//      await plugin.nvim.buffer.replace(res, lineStart -1); 
     } catch (err) {
-      writeErrorToFile(os.homedir(), 'vimerror.txt');
+      writeErrorToFile(os.homedir(), 'vimerror.txt', err.message);
     }
   }, { sync: false });
 
