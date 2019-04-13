@@ -10,7 +10,8 @@ const {
   toArray,
   toArrayInline,
   destructuringTabulationProps,
-  destructuringTabulationPropsToOneString
+  destructuringTabulationPropsToOneString,
+  destructuringTabulationRevert,
 } = require('./src/index');
 
 module.exports = plugin => {
@@ -122,7 +123,7 @@ module.exports = plugin => {
     to:
 
     const {
-     retrieveData, handleError, formatResponseMiddleware,  
+      retrieveData, handleError, formatResponseMiddleware,  
     } = require('../middlewares');
   */
 
@@ -148,14 +149,52 @@ module.exports = plugin => {
     }
   }, { sync: false });
 
+
+  /*
+    converts:
+      const { retrieveData, handleError, formatResponseMiddleware,  } = require('../middlewares');
+    to:
+
+    const {
+      retrieveData,
+      handleError,
+      formatResponseMiddleware,  
+    } = require('../middlewares');
+  */
   plugin.registerCommand('D2', async () => {
     try {
       const lines = await getSelectedLine()
       const res = destructuringTabulation(lines)
       const lineStart = await getLineStart();
-      //await plugin.nvim.buffer.replace(res, lineStart -1); 
       await plugin.nvim.buffer.remove(lineStart -1,lineStart); 
       await plugin.nvim.buffer.insert(res, lineStart - 1); 
+    } catch (err) {
+      writeErrorToFile(os.homedir(), 'vimerror.txt');
+    }
+  }, { sync: false });
+
+
+
+  /*
+    converts 
+      const {
+       retrieveData,
+       handleError,
+       formatResponseMiddleware,
+      } = require('../middlewares');
+    to
+      const { retrieveData, handleError, formatResponseMiddleware, } = require('../middlewares');
+
+  */
+
+  plugin.registerCommand('D3', async () => {
+    try {
+      const { start, end } = await getSelectedLinesRange();
+      let lines = await getSelectedLines(start -1, end);
+
+      const res = destructuringTabulationRevert(lines)
+      await plugin.nvim.buffer.remove(start -1, end); 
+      await plugin.nvim.buffer.insert(res, start - 1); 
     } catch (err) {
       writeErrorToFile(os.homedir(), 'vimerror.txt');
     }

@@ -40,7 +40,8 @@ const destructuringTabulation = (str) => {
   let middle = str
     .replace(startExp, '')
     .replace(endExp, '')
-    .replace(/\s/g,'').split(",").map(el => '  ' + el + ',');
+    .replace(/\s/g,'').split(",").map(el => '  ' + el + ',')
+    .filter(el => el.replace(/[\s\,]/g, '').length);
   const startRes = str.match(startExp);
   const endRes = str.match(endExp);
   const start = startRes && startRes[0];
@@ -52,6 +53,7 @@ const destructuringTabulation = (str) => {
 
 }
 
+const destructuringTabulationRevert = (lines = []) => (lines.join('').replace(/[\n]/g, ''));
 
 const getTabulationString = (count) => {
   let tab = '';
@@ -94,6 +96,7 @@ module.exports = {
   toArrayInline,
   destructuringTabulationProps,
   destructuringTabulationPropsToOneString,
+  destructuringTabulationRevert,
 }
 
 
