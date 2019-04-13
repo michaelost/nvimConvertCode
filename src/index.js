@@ -68,7 +68,7 @@ const destructuringTabulationProps = (str) => {
   const tabulation = props[0].length - props[0].replace(/\s/g, '').length;
   const tabString = getTabulationString(tabulation);
   return props
-    .filter(el => el)
+    .filter(el => el.replace(/[\s]/g, '').length)
     .map((el, index) => (index == 0 ? `${el},` : `${tabString}${el.replace(/\s/g, '')},`));
 }
 

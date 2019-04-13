@@ -116,6 +116,16 @@ module.exports = plugin => {
       }
     }, { sync: false });
 
+  /*
+    converts:
+      const { retrieveData, handleError, formatResponseMiddleware,  } = require('../middlewares');
+    to:
+
+    const {
+     retrieveData, handleError, formatResponseMiddleware,  
+    } = require('../middlewares');
+  */
+
   plugin.registerCommand('D', async () => {
     try {
       const lines = await getSelectedLine()
@@ -190,6 +200,7 @@ module.exports = plugin => {
       writeErrorToFile(os.homedir(), 'vimerror.txt', err.message);
     }
   }, { sync: false });
+
 
 
 };
