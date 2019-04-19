@@ -53,7 +53,7 @@ const destructuringTabulation = (str) => {
 
 }
 
-const destructuringTabulationRevert = (lines = []) => (lines.join('').replace(/[\n]/g, ''));
+const destructuringTabulationRevert = (lines = []) => lines.join('').replace(/[\n]/g, '').replace(/\s\s+/g, ' ');
 
 const getTabulationString = (count) => {
   let tab = '';
@@ -83,6 +83,11 @@ const destructuringTabulationPropsToOneString = (lines) => {
     .join('');
 }
 
+const convertWordsToDestructuringAssignment = (str) => {
+  const props = str.replace(/[.=*,]/g, '').split(' ').filter(el => el).join(', ');
+  return `const { ${props} } = `;
+}
+
 const getWrappedArray = (array) => ['{', ...array, '}'];
 const getWrappedArray2 = (array) => ['[', ...array, ']'];
 
@@ -97,6 +102,7 @@ module.exports = {
   destructuringTabulationProps,
   destructuringTabulationPropsToOneString,
   destructuringTabulationRevert,
+  convertWordsToDestructuringAssignment,
 }
 
 

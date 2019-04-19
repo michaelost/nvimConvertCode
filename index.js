@@ -12,6 +12,7 @@ const {
   destructuringTabulationProps,
   destructuringTabulationPropsToOneString,
   destructuringTabulationRevert,
+  convertWordsToDestructuringAssignment,
 } = require('./src/index');
 
 module.exports = plugin => {
@@ -193,6 +194,26 @@ module.exports = plugin => {
       let lines = await getSelectedLines(start -1, end);
 
       const res = destructuringTabulationRevert(lines)
+      await plugin.nvim.buffer.remove(start -1, end); 
+      await plugin.nvim.buffer.insert(res, start - 1); 
+    } catch (err) {
+      writeErrorToFile(os.homedir(), 'vimerror.txt');
+    }
+  }, { sync: false });
+
+  /*
+    converts 
+      retrieveData handleError
+    to
+      const { retrieveData, handleError } = 
+
+  */
+
+  plugin.registerCommand('D4', async () => {
+    try {
+      const { start, end } = await getSelectedLinesRange();
+      const line = await getSelectedLine();
+      const res = convertWordsToDestructuringAssignment(line);
       await plugin.nvim.buffer.remove(start -1, end); 
       await plugin.nvim.buffer.insert(res, start - 1); 
     } catch (err) {
