@@ -88,6 +88,15 @@ const convertWordsToDestructuringAssignment = (str) => {
   return `const { ${props} } = `;
 }
 
+const jsToJSON = (str) => {
+  return str.map(el => el
+    .replace(/[\'\"]/g, '')
+    .replace(/(\s{1,})([a-zA-Z0-9]{1,}):(.{1,}),/g, '$1\"$2\": \"$3\",')
+    .replace(/(\s{1,})([a-zA-Z0-9]{1,}):(.{1,})/g, '$1\"$2\": \"$3\"')
+  )
+  .filter(el => el)
+}
+
 const getWrappedArray = (array) => ['{', ...array, '}'];
 const getWrappedArray2 = (array) => ['[', ...array, ']'];
 
@@ -103,6 +112,6 @@ module.exports = {
   destructuringTabulationPropsToOneString,
   destructuringTabulationRevert,
   convertWordsToDestructuringAssignment,
+  jsToJSON,
 }
-
 

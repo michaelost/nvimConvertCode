@@ -13,6 +13,7 @@ const {
   destructuringTabulationPropsToOneString,
   destructuringTabulationRevert,
   convertWordsToDestructuringAssignment,
+  jsToJSON,
 } = require('./src/index');
 
 module.exports = plugin => {
@@ -267,6 +268,20 @@ module.exports = plugin => {
       await plugin.nvim.buffer.remove(start -1, end); 
       const res = destructuringTabulationPropsToOneString(lines)
       await plugin.nvim.buffer.insert(res, start -1); 
+    } catch (err) {
+      writeErrorToFile(os.homedir(), 'vimerror.txt', err.message);
+    }
+  }, { sync: false });
+
+/* converts js object to json */
+  plugin.registerCommand('JSON', async () => {
+    try {
+      const { start, end } = await getSelectedLinesRange();
+      const lines = await getSelectedLines(start -1, end);
+      const res = jsToJSON(lines)
+      await plugin.nvim.buffer.remove(start -1, end); 
+      await plugin.nvim.buffer.insert(res, start -1); 
+
     } catch (err) {
       writeErrorToFile(os.homedir(), 'vimerror.txt', err.message);
     }
