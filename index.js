@@ -287,6 +287,15 @@ module.exports = plugin => {
     }
   }, { sync: false });
 
+  plugin.registerCommand('INSERT', async () => {
+    try {
+      const currentLine = await plugin.nvim.eval("line('.')");
+      const lines = ['module.exports = {', '', '}'];
+      await plugin.nvim.buffer.insert(lines, currentLine); 
+    } catch (err) {
+      writeErrorToFile(os.homedir(), 'vimerror.txt', err.message);
+    }
+  }, { sync: false });
 
 
 };
