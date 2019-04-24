@@ -16,6 +16,10 @@ const {
   jsToJSON,
 } = require('./src/index');
 
+const {
+  wrapIntoFunction,
+} = require('./src/function');
+
 module.exports = plugin => {
 
   const getSelectedLine = async () => {
@@ -292,6 +296,19 @@ module.exports = plugin => {
       const currentLine = await plugin.nvim.eval("line('.')");
       const lines = ['module.exports = {', '', '}'];
       await plugin.nvim.buffer.insert(lines, currentLine); 
+    } catch (err) {
+      writeErrorToFile(os.homedir(), 'vimerror.txt', err.message);
+    }
+  }, { sync: false });
+
+  plugin.registerCommand('WRAPFUNCTION', async () => {
+    try {
+      const { start, end } = await getSelectedLinesRange();
+      const lines = await getSelectedLines(start -1, end);
+      const res = wrapIntoFunction(lines);
+      await plugin.nvim.buffer.remove(start -1, end); 
+      await plugin.nvim.buffer.insert(res, start -1); 
+
     } catch (err) {
       writeErrorToFile(os.homedir(), 'vimerror.txt', err.message);
     }

@@ -113,5 +113,6 @@ module.exports = {
   destructuringTabulationRevert,
   convertWordsToDestructuringAssignment,
   jsToJSON,
+  getTabulationString,
 }
 
