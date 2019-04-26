@@ -101,6 +101,7 @@ const getWrappedArray = (array) => ['{', ...array, '}'];
 const getWrappedArray2 = (array) => ['[', ...array, ']'];
 
 const getOnlyPropsFromObject = (str) => str.replace(/([a-zA-Z_0-9]{1,})(.{1,})/g, '$1,').replace(/[\n\.]/g, '').replace(/\s{2,}/g,' ');
+const getOnlyValuesFromObject = (str) => str.replace(/([a-zA-Z_0-9]{1,}\s{0,}:\s{0,})(.{1,})/g, '$2,').replace(/[\n\.]/g, '').replace(/\s{2,}/g,' ');
 
 module.exports = {
   convertArrowFunction,
@@ -117,5 +118,6 @@ module.exports = {
   jsToJSON,
   getTabulationString,
   getOnlyPropsFromObject,
+  getOnlyValuesFromObject,
 }
 
