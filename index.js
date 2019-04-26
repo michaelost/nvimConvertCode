@@ -14,6 +14,7 @@ const {
   destructuringTabulationRevert,
   convertWordsToDestructuringAssignment,
   jsToJSON,
+  getOnlyPropsFromObject,
 } = require('./src/index');
 
 const {
@@ -306,6 +307,22 @@ module.exports = plugin => {
       const { start, end } = await getSelectedLinesRange();
       const lines = await getSelectedLines(start -1, end);
       const res = wrapIntoFunction(lines);
+      await plugin.nvim.buffer.remove(start -1, end); 
+      await plugin.nvim.buffer.insert(res, start -1); 
+
+    } catch (err) {
+      writeErrorToFile(os.homedir(), 'vimerror.txt', err.message);
+    }
+  }, { sync: false });
+
+  plugin.registerCommand('GETONLYPROPS', async () => {
+    try {
+      const { start, end } = await getSelectedLinesRange();
+      const lines = await getSelectedLines(start -1, end);
+
+      writeErrorToFile(os.homedir(), 'vimerror.txt', lines.join());
+      const res = getOnlyPropsFromObject(lines.join('\n'));
+
       await plugin.nvim.buffer.remove(start -1, end); 
       await plugin.nvim.buffer.insert(res, start -1); 
 
