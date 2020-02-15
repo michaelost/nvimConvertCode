@@ -22,6 +22,10 @@ const {
   wrapIntoFunction,
 } = require('./src/function');
 
+const {
+  getWordInQuotes,
+} = require('./src/getwords/getWordInQuotes.js')
+
 module.exports = plugin => {
 
   const getSelectedLine = async () => {
@@ -339,6 +343,22 @@ module.exports = plugin => {
       writeErrorToFile(os.homedir(), 'vimerror.txt', err.message);
     }
   }, { sync: false });
+
+  plugin.registerCommand('GETWORDINQUOTES', async () => {
+    try {
+      const { start, end } = await getSelectedLinesRange();
+      const lines = await getSelectedLines(start -1, end);
+      const res = getWordInQuotes(lines).join('');
+      const command = `execute(":!echo -n ${res} | xclip -selection clipboard")`
+
+      writeErrorToFile(os.homedir(), 'vimerror.txt', command);
+      await plugin.nvim.eval(command);
+      writeErrorToFile(os.homedir(), 'vimerror.txt', res);
+    } catch (err) {
+      writeErrorToFile(os.homedir(), 'vimerror.txt', err.message);
+    }
+  }, { sync: false });
+
 
 
 };
