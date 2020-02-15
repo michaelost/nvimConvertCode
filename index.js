@@ -24,6 +24,7 @@ const {
 
 const {
   getWordInQuotes,
+  replaceWordInQuotesWithClipboardString,
 } = require('./src/getwords/getWordInQuotes.js')
 
 module.exports = plugin => {
@@ -350,10 +351,22 @@ module.exports = plugin => {
       const lines = await getSelectedLines(start -1, end);
       const res = getWordInQuotes(lines).join('');
       const command = `execute(":!echo -n ${res} | xclip -selection clipboard")`
-
       writeErrorToFile(os.homedir(), 'vimerror.txt', command);
       await plugin.nvim.eval(command);
       writeErrorToFile(os.homedir(), 'vimerror.txt', res);
+    } catch (err) {
+      writeErrorToFile(os.homedir(), 'vimerror.txt', err.message);
+    }
+  }, { sync: false });
+
+  plugin.registerCommand('REPLACEWORDINQUOTESWITCLIPBOARD', async () => {
+    try {
+      const { start, end } = await getSelectedLinesRange();
+      const lines = await getSelectedLines(start -1, end);
+      const fromClipboard = await plugin.nvim.eval('execute("echo @+")');
+      const res = replaceWordInQuotesWithClipboardString(lines, fromClipboard)
+      await plugin.nvim.buffer.remove(start -1, end); 
+      await plugin.nvim.buffer.insert(res, start -1); 
     } catch (err) {
       writeErrorToFile(os.homedir(), 'vimerror.txt', err.message);
     }
