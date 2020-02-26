@@ -27,6 +27,11 @@ const {
   replaceWordInQuotesWithClipboardString,
 } = require('./src/getwords/getWordInQuotes.js')
 
+const {
+  getListOfTags,
+  createStyledComponentsForTags,
+} = require('./src/html/index.js')
+
 module.exports = plugin => {
 
   const getSelectedLine = async () => {
@@ -367,6 +372,19 @@ module.exports = plugin => {
       const res = replaceWordInQuotesWithClipboardString(lines, fromClipboard)
       await plugin.nvim.buffer.remove(start -1, end); 
       await plugin.nvim.buffer.insert(res, start -1); 
+    } catch (err) {
+      writeErrorToFile(os.homedir(), 'vimerror.txt', err.message);
+    }
+  }, { sync: false });
+
+  plugin.registerCommand('GETTAGLIST', async () => {
+    try {
+      const { start, end } = await getSelectedLinesRange();
+      const lines = await getSelectedLines(start -1, end);
+      writeErrorToFile(os.homedir(), 'vimerror.txt', lines.join('\n').replace(/\n/g, ''));
+      const tags = await getListOfTags(lines.join('').replace(/\n/g, ''))
+      const styledComponents = createStyledComponentsForTags(tags)
+      await plugin.nvim.buffer.insert(styledComponents, end+1); 
     } catch (err) {
       writeErrorToFile(os.homedir(), 'vimerror.txt', err.message);
     }
