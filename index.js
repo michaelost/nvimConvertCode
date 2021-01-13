@@ -32,6 +32,16 @@ const {
   createStyledComponentsForTags,
 } = require('./src/html/index.js')
 
+const {
+ getPropsOutOfObject,
+} = require('./src/html/index.js')
+
+
+const {
+  componentSingleLine,
+  componentMultiLine,
+} = require('./src/react.js')
+
 module.exports = plugin => {
 
   const getSelectedLine = async () => {
@@ -384,12 +394,49 @@ module.exports = plugin => {
       writeErrorToFile(os.homedir(), 'vimerror.txt', lines.join('\n').replace(/\n/g, ''));
       const tags = await getListOfTags(lines.join('').replace(/\n/g, ''))
       const styledComponents = createStyledComponentsForTags(tags)
-      await plugin.nvim.buffer.insert(styledComponents, end+1); 
+      await plugin.nvim.buffer.insert(styledComponents, end +1 ); 
     } catch (err) {
       writeErrorToFile(os.homedir(), 'vimerror.txt', err.message);
     }
   }, { sync: false });
 
+  plugin.registerCommand('GETPROPSOUTOFOBJECT', async () => {
+    try {
+      const { start, end } = await getSelectedLinesRange();
+      const lines = await getSelectedLines(start -1, end);
+      const props = getPropsOutOfObject(lines)
+      await plugin.nvim.buffer.insert(props, end + 1); 
+    } catch (err) {
+      writeErrorToFile(os.homedir(), 'vimerror.txt', err.message);
+    }
+  }, { sync: false });
+
+  plugin.registerCommand('COMPSINGLELINE', async () => {
+    try {
+      const { start, end } = await getSelectedLinesRange();
+      const lines = await getSelectedLines(start - 1, end);
+      const props = componentSingleLine(lines)
+      //await plugin.nvim.buffer.insert(props, end + 1); 
+
+      await plugin.nvim.buffer.remove(start - 1, end); 
+      await plugin.nvim.buffer.insert(props, start - 1); 
+
+    } catch (err) {
+      writeErrorToFile(os.homedir(), 'vimerror.txt', err.message);
+    }
+  }, { sync: false });
+
+  plugin.registerCommand('COMPMULTILINE', async () => {
+    try {
+      const { start, end } = await getSelectedLinesRange();
+      const lines = await getSelectedLines(start - 1, end);
+      const props = componentMultiLine(lines)
+      await plugin.nvim.buffer.remove(start - 1, end); 
+      await plugin.nvim.buffer.insert(props, start - 1); 
+    } catch (err) {
+      writeErrorToFile(os.homedir(), 'vimerror.txt', err.message);
+    }
+  }, { sync: false });
 
 
 };

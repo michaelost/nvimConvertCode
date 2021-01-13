@@ -29,10 +29,18 @@ const createStyledComponentsForTags = (tags) => (
   })
 );
 
+const getPropsOutOfObject = (lines) => (
+  lines.map(line => {
+    const l = line.match(/\w*/g).map(el => el)[0]
+    return `${l}={${l}}`
+  })
+);
+
 
 module.exports = {
   getListOfTags,
   createStyledComponentsForTags,
+  getPropsOutOfObject,
 
 }
 
